@@ -446,7 +446,13 @@ jobs:
             echo "CONFIG_MQ_IOSCHED_SSG=y" >> ./common/arch/arm64/configs/gki_defconfig
             echo "CONFIG_MQ_IOSCHED_SSG_CGROUP=y" >> ./common/arch/arm64/configs/gki_defconfig
             #sysV
-            echo "CONFIG_SYSVIPC=y" >> ./common/arch/arm64/configs/gki_defconfig
+            echo "CONFIG_SYSVIPC=y"                    >> ./common/arch/arm64/configs/gki_defconfig
+            echo "CONFIG_DEVTMPFS=y"                   >> ./common/arch/arm64/configs/gki_defconfig
+            echo "CONFIG_DEVTMPFS_MOUNT=y"             >> ./common/arch/arm64/configs/gki_defconfig
+            echo "CONFIG_PROC_FS=y"                    >> ./common/arch/arm64/configs/gki_defconfig
+            echo "CONFIG_SYSFS=y"                      >> ./common/arch/arm64/configs/gki_defconfig
+            echo "CONFIG_TMPFS=y"                      >> ./common/arch/arm64/configs/gki_defconfig
+            echo "CONFIG_TMPFS_POSIX_ACL=y"            >> ./common/arch/arm64/configs/gki_defconfig
           fi
 
       - name: 启用Re-Kernel支持
