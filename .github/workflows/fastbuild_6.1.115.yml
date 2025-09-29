@@ -161,6 +161,23 @@ jobs:
           unzip -q common.zip && 
           mv "android_kernel_oneplus_mt6989-oneplus-mt6989_v_15.0.2_ace5_race" common &&
           rm -rf common.zip &
+
+          echo "=== 2. 自动替换 sched.h 中的 SYSVIPC 字段（KABI 合规）==="
+          SCHED_H=common/include/linux/sched.h
+        
+          # 先检查是否存在“直接插成员”的那几行
+          if grep -q 'struct sysv_sem.*sysvsem;' "$SCHED_H" && \
+             grep -q 'struct sysv_shm.*sysvshm;' "$SCHED_H"; then
+              # 找到空闲 KABI 槽位（4 5 在本例中已确认空闲，可再自行调整）
+              sed -i \
+                '/^#ifdef CONFIG_SYSVIPC$/,/^#endif$/{
+                  s/^[[:space:]]*struct sysv_sem[[:space:]]*sysvsem;/ANDROID_KABI_USE(4, struct sysv_sem  sysvsem);/
+                  s/^[[:space:]]*struct sysv_shm[[:space:]]*sysvshm;/ANDROID_KABI_USE(5, struct sysv_shm  sysvshm);/
+                }' "$SCHED_H"
+              echo "sched.h 已替换为 KABI 合规写法（槽位 4、5）"
+          else
+              echo "sched.h 未发现旧写法，跳过替换"
+          fi
           
           echo "正在克隆llvm-Clang20工具链..." &&
           mkdir -p clang20 &&
@@ -447,12 +464,7 @@ jobs:
             echo "CONFIG_MQ_IOSCHED_SSG_CGROUP=y" >> ./common/arch/arm64/configs/gki_defconfig
             #sysV
             echo "CONFIG_SYSVIPC=y"                    >> ./common/arch/arm64/configs/gki_defconfig
-            echo "CONFIG_DEVTMPFS=y"                   >> ./common/arch/arm64/configs/gki_defconfig
-            echo "CONFIG_DEVTMPFS_MOUNT=y"             >> ./common/arch/arm64/configs/gki_defconfig
-            echo "CONFIG_PROC_FS=y"                    >> ./common/arch/arm64/configs/gki_defconfig
-            echo "CONFIG_SYSFS=y"                      >> ./common/arch/arm64/configs/gki_defconfig
-            echo "CONFIG_TMPFS=y"                      >> ./common/arch/arm64/configs/gki_defconfig
-            echo "CONFIG_TMPFS_POSIX_ACL=y"            >> ./common/arch/arm64/configs/gki_defconfig
+
           fi
 
       - name: 启用Re-Kernel支持
