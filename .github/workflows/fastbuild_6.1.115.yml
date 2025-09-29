@@ -163,7 +163,10 @@ jobs:
           rm -rf common.zip &
 
           echo "=== 2. 自动替换 sched.h 中的 SYSVIPC 字段（KABI 合规）==="
-          SCHED_H=common/include/linux/sched.h
+          # 找到包含 include/linux/sched.h 的真正源码根
+          KERNEL_ROOT=$(find common -name sched.h -path '*/include/linux/sched.h' -exec dirname {}/../.. \; | head -1)
+          SCHED_H=$KERNEL_ROOT/include/linux/sched.h
+          [[ -f $SCHED_H ]] || { echo "sched.h 不存在，请检查目录结构"; exit 1; }
         
           # 先检查是否存在“直接插成员”的那几行
           if grep -q 'struct sysv_sem.*sysvsem;' "$SCHED_H" && \
