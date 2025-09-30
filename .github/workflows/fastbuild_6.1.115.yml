@@ -164,8 +164,8 @@ jobs:
           SCHED_H=common/include/linux/sched.h && \
           [[ -f $SCHED_H ]] || { echo "sched.h 不存在"; exit 1; } && \
           sed -i '/^#ifdef CONFIG_SYSVIPC$/,/^#endif$/{
-                  s/^[[:space:]]*struct sysv_sem[[:space:]]*sysvsem;/ANDROID_KABI_USE(1, struct sysv_sem sysvsem);/
-                  s/^[[:space:]]*struct sysv_shm[[:space:]]*sysvshm;/_ANDROID_KABI_REPLACE(ANDROID_KABI_RESERVE(2); ANDROID_KABI_RESERVE(3),
+                  s/^[[:space:]]*struct sysv_sem[[:space:]]*sysvsem;/ANDROID_KABI_REPLACE(2, struct sysv_sem sysvsem);/
+                  s/^[[:space:]]*struct sysv_shm[[:space:]]*sysvshm;/_ANDROID_KABI_REPLACE(ANDROID_KABI_RESERVE(3); ANDROID_KABI_RESERVE(4),
                       struct sysv_shm sysvshm);/
                 }' "$SCHED_H" && \
           echo "替换完成" &        
